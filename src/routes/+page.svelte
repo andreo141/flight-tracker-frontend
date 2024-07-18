@@ -20,8 +20,12 @@
 		<section class="grid-section-flights">
 			<h2>Flights</h2>
 			<div class="dates">
-				<span><strong>Departure:</strong> {data.departureDate}</span>
-				<span><strong>Return:</strong> {data.returnDate}</span>
+				{#if !data.departureDate && !data.returnDate}
+					<span>Loading data...</span>
+				{:else}
+					<span><strong>Departure:</strong> {data.departureDate}</span>
+					<span><strong>Return:</strong> {data.returnDate}</span>
+				{/if}
 			</div>
 			<ul>
 				{#each flights as flight}
