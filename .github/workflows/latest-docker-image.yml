@@ -39,4 +39,4 @@ jobs:
           platforms: linux/amd64
           push: true
           tags: |
-            andreo141/flight-tracker:latest
+            andreo141/flight-tracker-frontend:latest
