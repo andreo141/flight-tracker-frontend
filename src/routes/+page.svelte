@@ -30,6 +30,7 @@
 			<ul>
 				{#each flights as flight}
 					<li class="destination-wrapper">
+						<img src={flight.content.image.url} alt={flight.content.location.name} />
 						<div class="destination-info">
 							{#if flight.content.flightQuotes.cheapest.direct}
 								<span class="flight-type">Direct Flight</span>
@@ -39,7 +40,6 @@
 							<span class="price">{flight.content.flightQuotes.cheapest.price}</span>
 							<span class="location">{flight.content.location.name}</span>
 						</div>
-						<img src={flight.content.image.url} alt={flight.content.location.name} />
 					</li>
 				{/each}
 			</ul>
@@ -125,7 +125,7 @@
 		text-align: center;
 		width: 100%;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-		margin-bottom: 1rem;
+		margin-top: 1rem;
 	}
 
 	.flight-type {
