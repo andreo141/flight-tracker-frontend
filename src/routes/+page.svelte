@@ -2,11 +2,26 @@
 	import { onMount } from 'svelte';
 	export let data;
 	let flights = [];
+	const cacheKey = 'flightData';
+	const cacheExpiryKey = 'flightDataExpiry';
+	const cacheDuration = 1 * 60 * 60 * 1000; // 1 hour
 	onMount(async () => {
-		console.log('calling flight data API');
-		const res = await fetch('https://flights-api.andreo.dev/flights');
-		data = await res.json();
-		flights = data.data.everywhereDestination.results;
+		const now = new Date().getTime();
+		const cachedData = localStorage.getItem(cacheKey);
+		const cachedExpiry = localStorage.getItem(cacheExpiryKey);
+		if (cachedData && cachedExpiry && now < parseInt(cachedExpiry)) {
+			console.log('Using cached flight data');
+			data = JSON.parse(cachedData);
+			flights = data.data.everywhereDestination.results;
+		} else {
+			console.log('Calling flight data API');
+			const res = await fetch('https://flights-api.andreo.dev/flights');
+			data = await res.json();
+			flights = data.data.everywhereDestination.results;
+
+			localStorage.setItem(cacheKey, JSON.stringify(data));
+			localStorage.setItem(cacheExpiryKey, (now + cacheDuration).toString());
+		}
 	});
 </script>
 
@@ -23,6 +38,7 @@
 				{#if !data.departureDate && !data.returnDate}
 					<span>Loading data...</span>
 				{:else}
+					<span><strong>From:</strong> Brussels Airport </span>
 					<span><strong>Departure:</strong> {data.departureDate}</span>
 					<span><strong>Return:</strong> {data.returnDate}</span>
 				{/if}
@@ -121,9 +137,10 @@
 		background-color: #0073e6;
 		color: white;
 		border-radius: 8px;
-		padding: 1rem;
+		padding-top: 1rem;
+		padding-bottom: 1rem;
 		text-align: center;
-		width: 100%;
+		width: 70%;
 		box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 		margin-top: 1rem;
 	}
