@@ -2,26 +2,11 @@
 	import { onMount } from 'svelte';
 	export let data;
 	let flights = [];
-	const cacheKey = 'flightData';
-	const cacheExpiryKey = 'flightDataExpiry';
-	const cacheDuration = 1 * 60 * 60 * 1000; // 1 hour
 	onMount(async () => {
-		const now = new Date().getTime();
-		const cachedData = localStorage.getItem(cacheKey);
-		const cachedExpiry = localStorage.getItem(cacheExpiryKey);
-		if (cachedData && cachedExpiry && now < parseInt(cachedExpiry)) {
-			console.log('Using cached flight data');
-			data = JSON.parse(cachedData);
-			flights = data.data.everywhereDestination.results;
-		} else {
-			console.log('Calling flight data API');
-			const res = await fetch('https://flights-api.andreo.dev/flights');
-			data = await res.json();
-			flights = data.data.everywhereDestination.results;
-
-			localStorage.setItem(cacheKey, JSON.stringify(data));
-			localStorage.setItem(cacheExpiryKey, (now + cacheDuration).toString());
-		}
+		console.log('Calling flight data API');
+		const res = await fetch('https://flights-api.andreo.dev/flights');
+		data = await res.json();
+		flights = data.data.everywhereDestination.results;
 	});
 </script>
 
