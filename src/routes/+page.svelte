@@ -1,12 +1,26 @@
 <script>
 	import { onMount } from 'svelte';
+	import AirportSelect from '../lib/AirportSelect.svelte';
+	
 	export let data;
+	
 	let flights = [];
-	onMount(async () => {
-		console.log('Calling flight data API');
-		const res = await fetch('https://flights-api.andreo.dev/flights');
+	let airports = ['Brussels Airport', 'Heathrow', 'JFK']
+	let selectedAirport = 'Brussels Airport'
+
+	$: if (selectedAirport) {
+		fetchFlights(selectedAirport)
+	}
+
+	async function fetchFlights(airport) {
+		console.log(`fetching flights from ${airport}`);
+		const res = await fetch(`https://flights-api.andreo.dev/flights?airport=${airport}`)
 		data = await res.json();
 		flights = data.data.everywhereDestination.results;
+	}
+
+	onMount(async () => {
+		fetchFlights(selectedAirport)
 	});
 </script>
 
@@ -18,12 +32,14 @@
 
 	<main class="grid-main">
 		<section class="grid-section-flights">
-			<h2>Flights</h2>
+			<h2>Flights from {selectedAirport}</h2>
+
+			<AirportSelect {airports} bind:selectedAirport />
+            <br>
 			<div class="dates">
 				{#if !data.departureDate && !data.returnDate}
 					<span>Loading data...</span>
 				{:else}
-					<span><strong>From:</strong> Brussels Airport </span>
 					<span><strong>Departure:</strong> {data.departureDate}</span>
 					<span><strong>Return:</strong> {data.returnDate}</span>
 				{/if}
@@ -33,12 +49,12 @@
 					<li class="destination-wrapper">
 						<img src={flight.content.image.url} alt={flight.content.location.name} />
 						<div class="destination-info">
-							{#if flight.content.flightQuotes.cheapest.direct}
+							{#if flight.content.flightQuotes.cheapest?.direct}
 								<span class="flight-type">Direct Flight</span>
 							{:else}
 								<span class="flight-type">Connecting Flight</span>
 							{/if}
-							<span class="price">{flight.content.flightQuotes.cheapest.price}</span>
+							<span class="price">{flight.content.flightQuotes.cheapest?.price}</span>
 							<span class="location">{flight.content.location.name}</span>
 						</div>
 					</li>
